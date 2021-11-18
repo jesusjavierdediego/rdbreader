@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package rdboperatorproto;
+
+option go_package = ".;protobuf";
+option optimize_for = SPEED;
+/*
+	Generate the Go code from the events.proto file using the protobuf folder as the output destination:
+	'protoc -I=./protobuf --go_out=plugins=grpc:./protobuf ./protobuf/reader.proto'
+*/
+
+
+message RecordSet {
+    repeated string records = 1; // Each record is a JSOn string
+}
+
+message Criteria {
+    string boolean_operator = 1; // 'OR' | AND
+    string field = 2;
+    string is = 3; // 'equal' | 'like' 
+    string value = 4;
+}
+
+message RDBQuery {
+    string database_name = 1;
+    string collection_name = 2;
+    repeated Criteria query = 3;
+}
+
+message Empty {}
+
+service RecordQueryService {
+    rpc GetRDBRecords(RDBQuery) returns (RecordSet){}
+    //rpc GetRDBRecordsStream(RDBQuery) returns (stream RecordSet){} // events in a given query, record to record
+}

@@ -24,14 +24,22 @@ func NewRecordQueryService(query *pb.RDBQuery) *RecordQueryService {
 }
 
 
-
-
 func (s *RecordQueryService) GetRDBRecords(ctx context.Context, query *pb.RDBQuery) (*pb.RecordSet, error) {
 	methodMessage := "GetRDBRecords"
-	resultSet, err := mongodb.RunQuery(query.DatabaseName, "main", query.Query) // hardcoded for now, singlecoll per reepo
-	if err != nil {
-		utils.PrintLogError(err, componentMessage, methodMessage, "Error querying RDB")
-		return nil, status.New(14, "Error querying RDB - Reason: "+err.Error()).Err()
+	var resultSet []map[string]interface{}
+	var err error
+	if !(len(query.Query) > 0) {
+		resultSet, err = mongodb.GetAllRecordsFromCollection(query.DatabaseName, "main")
+		if err != nil {
+			utils.PrintLogError(err, componentMessage, methodMessage, "Error querying RDB")
+			return nil, status.New(14, "Error getting RDB collection - Reason: "+err.Error()).Err()
+		}
+	} else {
+		resultSet, err = mongodb.RunQuery(query.DatabaseName, "main", query) 
+		if err != nil {
+			utils.PrintLogError(err, componentMessage, methodMessage, "Error querying RDB")
+			return nil, status.New(14, "Error querying RDB - Reason: "+err.Error()).Err()
+		}
 	}
 	var arrayOfRecordsStr []string
 	for _, record := range resultSet {
@@ -44,6 +52,4 @@ func (s *RecordQueryService) GetRDBRecords(ctx context.Context, query *pb.RDBQue
 	}
 	result := pb.RecordSet{Records: arrayOfRecordsStr}
 	return &result, nil
-
-	return nil, err
 }
