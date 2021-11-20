@@ -31,5 +31,6 @@ message Empty {}
 
 service RecordQueryService {
     rpc GetRDBRecords(RDBQuery) returns (RecordSet){}
+    rpc GetRDBRecordsFromQuery(RDBQuery) returns (RecordSet){}
     //rpc GetRDBRecordsStream(RDBQuery) returns (stream RecordSet){} // events in a given query, record to record
 }

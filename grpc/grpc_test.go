@@ -9,11 +9,21 @@ import (
 	"time"
 	pb "xqledger/rdbreader/protobuf"
 	utils "xqledger/rdbreader/utils"
+	"testing"
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 var rdbreader_address = "localhost:" + strconv.Itoa(config.GrpcServer.Port)
 var rdbreader_conn *grpc.ClientConn
 var rdbreader_connErr error
+
+const id = "111111111111111111111111"
+const dbName = "TestRepository"
+const colName = "main"
+const name = "John"
+const surname = "Wayne"
+const age = 55
+const query = ""
 
 func getRDBReaderServerConn() (*grpc.ClientConn, error) {
 	rdbreader_conn, rdbreader_connErr = grpc.Dial(rdbreader_address, grpc.WithInsecure())
@@ -47,7 +57,7 @@ func getCriteriaSet() []*pb.Criteria{
 	return criteria
 }
 
-func GetRecordsFromQuery(dbName, query string) (*pb.RecordSet, error) {
+func GetRecordsFromQuery() (*pb.RecordSet, error) {
 	var methodMessage = "GetRecordsFromQuery"
 	var emptyResult pb.RecordSet
 	rdbreader_conn, rdbreader_connErr = getRDBReaderServerConn()
@@ -73,4 +83,12 @@ func GetRecordsFromQuery(dbName, query string) (*pb.RecordSet, error) {
 
 	utils.PrintLogInfo(componentMessage, methodMessage, fmt.Sprintf("Number of successfully retrieved records: %d", len(recordSet.Records)))
 	return recordSet, nil
+}
+
+func TestGetRecordsFromQuery(t *testing.T) {
+	Convey("Should RDBRecords", t, func() {
+		recordSet, err := GetRecordsFromQuery()
+		So(err, ShouldBeNil)
+		So(len(recordSet.Records), ShouldNotBeNil)
+	})
 }

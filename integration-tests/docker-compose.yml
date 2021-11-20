@@ -24,5 +24,23 @@ services:
       MONGO_EXTRA_ARGS: '--ipv6 --quiet'
     restart: always  
   
+  rdb-reader:
+    image: rdbreader:latest
+    container_name: rdbreader
+    build:
+      context: ../../rdbreader
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /var/tmp:/var/git/repositories:rw
+    ports:
+      - "50052:50052"
+    networks:
+      - exp-ledger 
+    depends_on:    
+      - rdb
+  
 
   

@@ -11,6 +11,7 @@
 rdbreader
 
 integration-tests/mongo-volume
+testreports/*.xml
 # Test binary, build with `go test -c`
 *.test
 
