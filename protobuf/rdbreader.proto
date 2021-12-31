@@ -27,10 +27,15 @@ message RDBQuery {
     repeated Criteria query = 3;
 }
 
+message RDCColCount {
+    int64 count = 1;
+}
+
 message Empty {}
 
-service RecordQueryService {
+service RDBQueryService {
     rpc GetRDBRecords(RDBQuery) returns (RecordSet){}
-    rpc GetRDBRecordsFromQuery(RDBQuery) returns (RecordSet){}
-    //rpc GetRDBRecordsStream(RDBQuery) returns (stream RecordSet){} // events in a given query, record to record
+    // rpc GetRDBRecordsFromQuery(RDBQuery) returns (RecordSet){}
+    rpc GetNumberRecordsFromColl(RDBQuery) returns (RDCColCount){}
+    //rpc GetRDBRecordsStream(RDBQuery) returns (stream RecordSet){} // continuous query in a unidirectional stream
 }

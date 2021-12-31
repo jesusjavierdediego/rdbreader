@@ -66,7 +66,7 @@ func GetRecordsFromQuery() (*pb.RecordSet, error) {
 		return &emptyResult, rdbreader_connErr
 	}
 	defer rdbreader_conn.Close()
-	c := pb.NewRecordQueryServiceClient(rdbreader_conn)
+	c := pb.NewRDBQueryServiceClient(rdbreader_conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
@@ -85,10 +85,42 @@ func GetRecordsFromQuery() (*pb.RecordSet, error) {
 	return recordSet, nil
 }
 
+func GetCountRecordsFromColl() (*pb.RDCColCount, error) {
+	var methodMessage = "GetCountRecordsFromColl"
+	var emptyResult pb.RDCColCount
+	rdbreader_conn, rdbreader_connErr = getRDBReaderServerConn()
+	if rdbreader_connErr != nil {
+		utils.PrintLogError(rdbreader_connErr, componentMessage, methodMessage, "Error in connection")
+		return &emptyResult, rdbreader_connErr
+	}
+	defer rdbreader_conn.Close()
+	c := pb.NewRDBQueryServiceClient(rdbreader_conn)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	var q pb.RDBQuery
+	q.DatabaseName = dbName
+	q.CollectionName = "main"
+
+	count, err := c.GetNumberRecordsFromColl(ctx, &q)
+	if err != nil {
+		utils.PrintLogError(err, componentMessage, methodMessage, "Error in grpc server")
+		return &emptyResult, err
+	}
+
+	utils.PrintLogInfo(componentMessage, methodMessage, fmt.Sprintf("Number of count records: %d", count.Count))
+	return count, nil
+}
+
 func TestGetRecordsFromQuery(t *testing.T) {
-	Convey("Should RDBRecords", t, func() {
+	Convey("Should get RDBRecords", t, func() {
 		recordSet, err := GetRecordsFromQuery()
 		So(err, ShouldBeNil)
 		So(len(recordSet.Records), ShouldNotBeNil)
+	})
+	Convey("Should get Number of RDBRecords", t, func() {
+		coll, err := GetCountRecordsFromColl()
+		So(err, ShouldBeNil)
+		So(coll.Count, ShouldBeGreaterThan, 0)
 	})
 }

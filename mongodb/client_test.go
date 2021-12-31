@@ -119,5 +119,11 @@ func TestRDBClient(t *testing.T) {
 		So(len(result), ShouldBeGreaterThan, 0)
 	})
 
+	Convey("Check RDB get count records", t, func() {
+		result, err := GetNumberOfRecordsFromCollection("TestRepository", "main")
+		So(err, ShouldBeNil)
+		So(result, ShouldBeGreaterThan, 0)
+	})
+
 	deleteRecord(client, context.TODO(), dbName, colName, id)
 }

@@ -24,9 +24,10 @@ func main() {
 		utils.PrintLogError(listenerErr, componentMessage, "Starting", "Error")
 	}
 	utils.PrintLogInfo(componentMessage, "Starting", "Starting RDB operator gRPC services on port "+strconv.Itoa(grpcPort))
-	service := pb.RecordQueryServiceServer(&grpcserver.RecordQueryService{})
+	service := pb.RDBQueryServiceServer(&grpcserver.RDBQueryService{})
+	//service := pb.RDBQueryServiceServer(&grpcserver.RDBQueryService{})
 	server := grpc.NewServer()
-	pb.RegisterRecordQueryServiceServer(server, service)
+	pb.RegisterRDBQueryServiceServer(server, service)
 
 	if err := server.Serve(listener); err != nil {
 		utils.PrintLogError(listenerErr, componentMessage, "Grpc Server start", "Error")

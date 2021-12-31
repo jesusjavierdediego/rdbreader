@@ -145,3 +145,19 @@ func GetAllRecordsFromCollection(dbName string, colName string) ([]map[string]in
 	utils.PrintLogInfo(componentMessage, methodMsg, fmt.Sprintf("Records in collection %s, database %s obtained OK", colName, dbName))
 	return resultSet, nil
 }
+
+func GetNumberOfRecordsFromCollection(dbName string, colName string) (int64, error) {
+	methodMsg := "GetAllRecordsFromCollection"
+	rdbClient, err := getRDBClient()
+	if err != nil {
+		utils.PrintLogError(err, componentMessage, methodMsg, "Error getting MongoDB client")
+		return 0, err
+	}
+	col := rdbClient.Database(dbName).Collection(colName)
+	count, err := col.CountDocuments(context.TODO(), bson.D{})
+	if err != nil {
+		utils.PrintLogError(err, componentMessage, methodMsg, "Error getting count records from coll")
+		return 0, err
+	}
+	return count, nil
+}
